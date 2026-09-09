@@ -1,0 +1,93 @@
+# Justfile — the single entrypoint for local dev and CI.
+#
+# Recipes here mirror `.github/workflows/validate.yml` and `.github/workflows/security.yml`
+# so local and CI behavior stay identical.
+#
+# ── EDIT ME ──────────────────────────────────────────────────────────────
+# Fill in the actual commands for your stack, then delete the no-op echoes.
+# ──────────────────────────────────────────────────────────────────────────
+
+# Package manager used by this repo (npm | pnpm | yarn | pip | uv | cargo | go | ...)
+PACKAGE_MANAGER := "{{PACKAGE_MANAGER}}"
+
+# Docker image name used by docker-* recipes
+DOCKER_IMAGE := "{{DOCKER_IMAGE}}"
+
+# Core commands — replace with your real commands (and remove the no-op defaults)
+FORMAT_CMD := "echo 'no formatter configured'"
+LINT_CMD   := "echo 'no linter configured'"
+BUILD_CMD  := "echo 'no build configured'"
+TEST_CMD   := "echo 'no tests configured'"
+CLEAN_CMD  := "echo 'no clean command configured'"
+
+# ── Recipes ───────────────────────────────────────────────────────────────
+
+# Print available recipes
+default:
+    @just --list
+
+# Install pinned local tooling (gitleaks, trufflehog, osv-scanner, pre-commit)
+install-tools:
+    @echo "Installing pinned local tooling…"
+    @if ! command -v gitleaks >/dev/null; then \
+        curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz -o /tmp/gitleaks.tgz && \
+        tar -xzf /tmp/gitleaks.tgz gitleaks && sudo install gitleaks /usr/local/bin/gitleaks && rm -f gitleaks /tmp/gitleaks.tgz; \
+    else echo "  gitleaks already installed"; fi
+    @if ! command -v trufflehog >/dev/null; then \
+        curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh | sh -s -- -b /usr/local/bin v3.97.4; \
+    else echo "  trufflehog already installed"; fi
+    @if ! command -v osv-scanner >/dev/null; then \
+        curl -sSfL https://github.com/google/osv-scanner/releases/download/v2.5.1/osv-scanner_linux_amd64 -o /tmp/osv-scanner && \
+        sudo install /tmp/osv-scanner /usr/local/bin/osv-scanner && rm -f /tmp/osv-scanner; \
+    else echo "  osv-scanner already installed"; fi
+    @if ! command -v pre-commit >/dev/null; then \
+        python3 -m pip install --user --break-system-packages pre-commit; \
+    else echo "  pre-commit already installed"; fi
+    @echo "Done. Run: just hooks"
+
+# Install git hooks (requires pre-commit)
+hooks:
+    pre-commit install
+
+# Format code
+format:
+    {{FORMAT_CMD}}
+
+# Lint code
+lint:
+    {{LINT_CMD}}
+
+# Build the app
+build:
+    {{BUILD_CMD}}
+
+# Run unit + integration tests
+test:
+    {{TEST_CMD}}
+
+# ── Gates ─────────────────────────────────────────────────────────────────
+
+# Run the full validate gate: format, lint, build, test (mirrors validate.yml)
+validate: format lint build test
+
+# Run security scans (mirrors security.yml)
+security:
+    gitleaks git --exit-code 1
+    trufflehog git file://. --results=verified --fail --no-update
+    osv-scanner scan source --recursive .
+
+# ── Docker ────────────────────────────────────────────────────────────────
+
+# Build the container image
+docker-build:
+    docker build -t {{DOCKER_IMAGE}}:latest .
+
+# Build and run the container
+docker-run: docker-build
+    docker run --rm -p 8080:8080 {{DOCKER_IMAGE}}:latest
+
+# ── Cleanup ───────────────────────────────────────────────────────────────
+
+# Remove build artifacts and caches
+clean:
+    {{CLEAN_CMD}}

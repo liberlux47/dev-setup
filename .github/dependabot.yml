@@ -1,0 +1,46 @@
+# Dependabot — keep dependencies patched via reviewed PRs.
+# Schedule: weekly. Group strategy: keep updates in fewer, reviewable PRs.
+
+version: 2
+updates:
+  # npm / node
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      minor-and-patch:
+        applies-to: version-updates
+        update-types: ["minor", "patch"]
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(ci)"
+
+# Uncomment / adjust for other ecosystems (one block per ecosystem):
+#   - package-ecosystem: "pip"          # Python (requirements.txt / pyproject.toml)
+#     directory: "/"
+#     schedule:
+#       interval: "weekly"
+#   - package-ecosystem: "gomod"        # Go
+#     directory: "/"
+#     schedule:
+#       interval: "weekly"
+#   - package-ecosystem: "cargo"        # Rust
+#     directory: "/"
+#     schedule:
+#       interval: "weekly"
+#   - package-ecosystem: "docker"       # Container base images
+#     directory: "/"
+#     schedule:
+#       interval: "weekly"

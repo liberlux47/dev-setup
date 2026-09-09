@@ -1,0 +1,22 @@
+# Normalize line endings — everything is LF in the repo
+* text=auto eol=lf
+
+# Binary files must not be modified
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+
+# Linguist hints: docs are not counted as code
+docs/** linguist-documentation
+openwiki/** linguist-documentation
+*.md linguist-documentation
+
+# Generated/vendored
+templates/** linguist-vendored

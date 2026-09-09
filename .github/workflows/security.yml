@@ -1,0 +1,57 @@
+# Security — secret scanning (gitleaks + trufflehog) on push/PR,
+# plus scheduled + event-driven dependency vulnerability scanning (osv-scanner).
+#
+# Actions are pinned to full commit SHAs per SECURITY.md (never `@v4` tags).
+
+name: security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1" # weekly Monday 06:00 UTC
+
+permissions:
+  contents: read
+  # Required to upload SARIF results to the Security > Code Scanning tab
+  security-events: write
+  actions: read
+
+jobs:
+  secrets:
+    name: Secret scanning (gitleaks + trufflehog)
+    runs-on: ubuntu-latest
+    steps:
+      # actions/checkout v4 -> 11d5960a326750d5838078e36cf38b85af677262
+      # Fetch full history so the scans can look across all commits.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+
+      # gitleaks-action v3 -> e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # trufflehog v3.97.4 -> 363923b901c911a9164f50b6c423f47c15372b1c
+      - name: TruffleHog
+        uses: trufflesecurity/trufflehog@363923b901c911a9164f50b6c423f47c15372b1c
+        with:
+          path: .
+          base: ${{ github.event.repository.default_branch }}
+          head: ${{ github.head_ref || github.ref_name }}
+          extra_args: --results=verified,unknown
+
+  dependency-scan-pr:
+    name: Dependency scan (osv-scanner, PR diff)
+    # Only report new vulnerabilities introduced by the PR.
+    if: github.event_name == 'pull_request'
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@8deb546fdb875b9996d27d4950be7312dac076a1
+
+  dependency-scan-full:
+    name: Dependency scan (osv-scanner, full)
+    # Full scan on push to default branch and on the weekly schedule.
+    if: github.event_name != 'pull_request'
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@8deb546fdb875b9996d27d4950be7312dac076a1

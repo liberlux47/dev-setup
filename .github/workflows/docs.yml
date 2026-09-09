@@ -1,0 +1,49 @@
+# Docs — build and deploy the documentation site.
+# Triggered on pushes to the release/production branch (and tags), so docs ship
+# with releases. Adjust the trigger branches to match your release process.
+#
+# Actions are pinned to full commit SHAs per SECURITY.md.
+
+name: docs
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # Needed to publish a PR/commit for generated docs (adjust if you use a
+  # separate docs host instead).
+  contents: write
+
+jobs:
+  docs:
+    name: Build docs
+    runs-on: ubuntu-latest
+    steps:
+      # actions/checkout v4 -> 11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      # If OpenWiki is used, regenerate the agent wiki so docs stay fresh.
+      # Requires Node 22+. Pin to a full SHA once you've chosen a version.
+      - name: Update OpenWiki docs
+        run: |
+          if command -v openwiki >/dev/null 2>&1 || [ -d openwiki ]; then
+            npm install -g openwiki
+            openwiki --update --print || echo "openwiki update skipped (no wiki initialized)"
+          fi
+
+      # Build the docs site (adjust to your docs tooling: mkdocs, docusaurus, etc.)
+      # - name: Build docs site
+      #   run: |
+      #     pip install mkdocs
+      #     mkdocs build
+
+      # Deploy — replace with your target (gh-pages, S3, GitHub Pages, etc.)
+      # - name: Deploy docs
+      #   uses: peaceiris/actions-gh-pages@<full-sha>
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     publish_dir: ./site

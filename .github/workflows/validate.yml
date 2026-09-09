@@ -1,0 +1,45 @@
+# Validate — the standard quality gate for every push and pull request.
+# Mirrors the local `just validate` (format, lint, build, test).
+#
+# Actions are pinned to full commit SHAs per SECURITY.md (never `@v4` tags).
+
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: lint, format, build, test
+    runs-on: ubuntu-latest
+    steps:
+      # actions/checkout v4 -> 11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      # Install just (the command runner this repo is built around)
+      # extractions/setup-just v3 -> f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b
+      - uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b
+
+      # Install the runtime (pick what your repo needs)
+      # actions/setup-node v4 -> 49933ea5288caeca8642d1e84afbd3f7d6820020
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+          cache: "npm"
+      # actions/setup-python v5 -> a26af69be951a213d495a4c3e4e4022e16d87065
+      # - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+      #   with:
+      #     python-version: "3.12"
+
+      # The whole gate in one command (mirrors local dev)
+      # {{INSTALL_CMD}} e.g. npm ci, pip install -r requirements.txt, go mod download
+      - name: Install dependencies
+        run: "{{INSTALL_CMD}}"
+
+      - name: Validate
+        run: just validate
