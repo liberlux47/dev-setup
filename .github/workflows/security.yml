@@ -66,4 +66,4 @@ jobs:
     name: Dependency scan (osv-scanner, full)
     # Full scan on push to default branch and on the weekly schedule.
     if: github.event_name != 'pull_request'
-    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@8deb546fdb875b9996d27d4950be7312dac076a1
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@6e4298ebc4db23e847df9b2e2de2939d6f066c67
