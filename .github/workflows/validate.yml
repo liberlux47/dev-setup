@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # actions/checkout v4 -> 11d5960a326750d5838078e36cf38b85af677262
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
       # Install just (the command runner this repo is built around)
       # extractions/setup-just v3 -> f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b
