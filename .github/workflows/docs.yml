@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # actions/checkout v4 -> 11d5960a326750d5838078e36cf38b85af677262
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
       # If OpenWiki is used, regenerate the agent wiki so docs stay fresh.
       # Requires Node 22+. Pin to a full SHA once you've chosen a version.
