@@ -82,7 +82,9 @@ There should be **zero** matches when you're done.
 | `.env.example`           | documented environment variables (never real values)             |
 | `Dockerfile`             | generic multi-stage container template                           |
 | `.dockerignore`          | keep build context small                                         |
-| `.pre-commit-config.yaml`| gitleaks + trufflehog + osv-scanner + format/lint hooks          |
+| `.pre-commit-config.yaml`| gitleaks + trufflehog + osv-scanner + dep-age + format/lint hooks|
+| `.trufflehog-excludes`   | regex exclusions for the trufflehog secret scan                  |
+| `scripts/check-dep-age.py`| dependency freshness gate (all deps >= 7 days old)              |
 | `Justfile`               | the single entrypoint: `install-tools`, `validate`, `security`, …|
 
 ## Placeholders in workflow files

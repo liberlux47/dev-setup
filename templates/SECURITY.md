@@ -52,7 +52,21 @@ This repository applies the following rules. CI and local hooks
 - **Dependabot** opens update PRs so vulnerable dependencies are patched
   promptly.
 
-### 5. Containers follow the same rules
+### 5. Dependencies must be at least 7 days old (7-day exclusive rule)
+
+- Every pinned dependency version must have been **published at least 7 days
+  before** it is allowed into the repository. Newly released packages are
+  rejected because they have not yet received community and tooling scrutiny;
+  malicious or broken releases are usually discovered within the first days
+  after publication.
+- Enforced by `scripts/check-dep-age.py` (CI: `security.yml` →
+  `dependency-age`; local: `just dep-age` and a pre-commit hook). It supports
+  npm (`package-lock.json`), pip (`requirements*.txt`), cargo (`Cargo.lock`),
+  and Go (`go.mod`).
+- An exception requires an explicit, reviewed decision — recorded in the PR
+  that introduces the dependency.
+
+### 6. Containers follow the same rules
 
 - `Dockerfile` uses pinned base image digests where feasible, never `latest`.
 - `.dockerignore` keeps the build context minimal.

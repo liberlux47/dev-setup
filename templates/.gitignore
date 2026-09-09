@@ -63,6 +63,9 @@ junit.xml
 .pre-commit-config-local.yaml
 .gitleaks.toml.local
 
+# ---- Dependency freshness gate cache ----
+.cache/dep-age-cache.json
+
 # ---- Docs / generated ----
 openwiki/.last-update.json
 

@@ -70,11 +70,17 @@ test:
 # Run the full validate gate: format, lint, build, test (mirrors validate.yml)
 validate: format lint build test
 
+# Enforce the dependency freshness gate: every pinned dependency must be at
+# least 7 days old (7-day exclusive rule). Adjust with --min-age-days.
+dep-age:
+    python3 scripts/check-dep-age.py --min-age-days 7
+
 # Run security scans (mirrors security.yml)
 security:
     gitleaks git --exit-code 1
-    trufflehog git file://. --results=verified --fail --no-update
+    trufflehog git file://. --results=verified --fail --no-update --exclude-paths .trufflehog-excludes
     osv-scanner scan source --recursive .
+    just dep-age
 
 # ── Docker ────────────────────────────────────────────────────────────────
 

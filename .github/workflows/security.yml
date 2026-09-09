@@ -42,7 +42,19 @@ jobs:
           path: .
           base: ${{ github.event.repository.default_branch }}
           head: ${{ github.head_ref || github.ref_name }}
-          extra_args: --results=verified,unknown
+          extra_args: --results=verified,unknown --exclude-paths .trufflehog-excludes
+
+  dependency-age:
+    name: Dependency freshness (7-day exclusive rule)
+    runs-on: ubuntu-latest
+    steps:
+      # actions/checkout v4 -> 11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      # Every pinned dependency must be at least 7 days old (freshly published
+      # packages are rejected until they receive community/tooling scrutiny).
+      - name: Check dependency ages
+        run: python3 scripts/check-dep-age.py --min-age-days 7
 
   dependency-scan-pr:
     name: Dependency scan (osv-scanner, PR diff)

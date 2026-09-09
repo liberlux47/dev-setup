@@ -1,0 +1,43 @@
+# TruffleHog exclusion patterns — newline-separated regexes.
+# Files matching these are skipped during secret scanning.
+#
+# Use this ONLY for files that legitimately contain test/example keys or
+# generated/third-party content. Never add real source files to hide a leak —
+# that would defeat the entire purpose of the scan.
+#
+# Reference: trufflehog -x / --exclude-paths
+#   trufflehog git file://. --exclude-paths .trufflehog-excludes
+
+# --- Generated / build output ---
+dist/
+build/
+coverage/
+node_modules/
+vendor/
+
+# --- Lockfiles / dependency metadata (generated, no secrets expected) ---
+.*package-lock\.json$
+.*pnpm-lock\.yaml$
+.*yarn\.lock$
+.*poetry\.lock$
+.*Pipfile\.lock$
+.*Cargo\.lock$
+.*go\.sum$
+
+# --- Large binary assets ---
+.*\.min\.js$
+.*\.map$
+.*\.pdf$
+.*\.png$
+.*\.jpg$
+.*\.jpeg$
+.*\.gif$
+.*\.woff2?$
+
+# --- Agent-generated documentation (may reference keys in examples) ---
+^openwiki/
+docs/adr/.*\.md$
+
+# --- Fixtures that intentionally contain fake keys ---
+^test/fixtures/.*(key|secret|token|credential).*$
+^tests/fixtures/.*(key|secret|token|credential).*$

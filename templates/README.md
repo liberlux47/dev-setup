@@ -20,7 +20,8 @@ just format     # format code
 just lint       # lint code
 just build      # build the app
 just test       # unit + integration tests
-just security   # gitleaks + trufflehog + osv-scanner
+just dep-age    # dependency freshness gate (all deps >= 7 days old)
+just security   # gitleaks + trufflehog + osv-scanner + dep-age
 ```
 
 `just validate` runs format, lint, build, and test in sequence — the same gates

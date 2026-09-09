@@ -13,13 +13,25 @@ repos:
     rev: v3.97.4
     hooks:
       - id: trufflehog
-        args: [--no-update]
+        args: [--no-update, --exclude-paths, .trufflehog-excludes]
 
   # ---- Dependency vulnerability scanning ----
   - repo: https://github.com/google/osv-scanner
     rev: v2.5.1
     hooks:
       - id: osv-scanner
+
+  # ---- Dependency freshness gate (7-day exclusive rule) ----
+  # Every pinned dependency must be at least 7 days old. Runs always, so it
+  # also catches new dependencies added mid-PR.
+  - repo: local
+    hooks:
+      - id: check-dep-age
+        name: Dependency freshness gate (>= 7 days old)
+        entry: python3 scripts/check-dep-age.py --min-age-days 7
+        language: system
+        pass_filenames: false
+        always_run: true
 
   # ---- Formatting / linting (adjust to your stack) ----
   # - repo: https://github.com/pre-commit/mirrors-prettier

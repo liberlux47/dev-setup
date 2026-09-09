@@ -62,10 +62,12 @@ These are the ground rules that apply to every repo scaffolded from this bluepri
 
 - `validate.yml` — gate for lint/format/build/test on every push and PR.
 - `security.yml` — gitleaks (secrets) + trufflehog (secrets, verified) on push/PR,
-  plus a weekly osv-scanner (dependency vulnerabilities) sweep.
-- `pre-commit-config.yaml` — same secret/vuln checks run locally before anything
-  reaches CI.
-- `SECURITY.md` — documents supported versions and how to report a vulnerability.
+  a weekly osv-scanner (dependency vulnerabilities) sweep, and a dependency
+  freshness gate (every dependency >= 7 days old).
+- `pre-commit-config.yaml` — same secret/vuln/freshness checks run locally before
+  anything reaches CI.
+- `SECURITY.md` — documents supported versions, the 7-day dependency rule, and
+  how to report a vulnerability.
 
 ### Architecture decisions are rare and deliberate
 
